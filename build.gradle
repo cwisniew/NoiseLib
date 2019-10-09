@@ -1,0 +1,95 @@
+
+buildscript {
+    dependencies {
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.13.0"
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+// Access Git info from build script
+plugins {
+    id "org.ajoberstar.grgit" version "3.0.0"
+}
+
+
+apply plugin: 'application'
+apply plugin: 'com.diffplug.gradle.spotless'
+apply plugin: 'maven'
+
+
+
+sourceCompatibility = 9
+targetCompatibility = 9
+
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
+}
+
+
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+}
+
+// Custom properties
+ext {
+    // Get tag and commit info from Git to use for version numbering
+    def repo = org.ajoberstar.grgit.Grgit.open(currentDir: file('.'))
+    def head = repo.head()
+    def tags = repo.tag.list().find {
+        it.commit == head
+    }
+
+    if (tags) {
+        tagVersion = tags.getName()
+        project.version = tagVersion
+    }
+
+    revision = head.abbreviatedId
+    revisionFull = head.id
+
+//    println 'Configuring for ' + project.name + " " + tagVersion + " by " + vendor
+}
+group = "net.rptools.noise-lib"
+
+spotless {
+    java {
+        licenseHeaderFile 'spotless.license.java'
+        // Now using the Google Java style guide
+        //eclipse().configFile('build-resources/eclipse.prefs.formatter.xml')
+        googleJavaFormat()
+        // If you get exceptions thrown by spotlessApply, this might
+        // help.  Enable it here if the problem is with a Java file, and
+        // below if it is not.  Don't leave it enabled, as nothing will
+        // actually be updated if you do.
+        // https://github.com/diffplug/spotless/blob/master/PADDEDCELL.md
+        //paddedCell()
+    }
+
+    format 'misc', {
+        target '**/*.gradle', '**/.gitignore'
+
+        // spotless has built-in rules for most basic formatting tasks
+        trimTrailingWhitespace()
+        // or spaces. Takes an integer argument if you don't like 4
+        indentWithSpaces(4)
+        //paddedCell()
+    }
+}
+
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'NoiseLib',
+                'Implementation-Version': project.version
+    }
+}
+
