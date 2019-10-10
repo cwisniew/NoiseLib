@@ -1,7 +1,7 @@
 
 buildscript {
     dependencies {
-        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.13.0"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:3.25.0"
     }
 
     repositories {
@@ -15,20 +15,21 @@ plugins {
 }
 
 
-apply plugin: 'application'
+apply plugin: 'java'
 apply plugin: 'com.diffplug.gradle.spotless'
 apply plugin: 'maven'
 
 
 
-sourceCompatibility = 9
-targetCompatibility = 9
+sourceCompatibility = 11
+targetCompatibility = 11
 
 
 // In this section you declare where to find the dependencies of your project
 repositories {
     mavenCentral()
     mavenLocal()
+    maven { url = 'http://maptool.craigs-stuff.net/repo/' }
     maven { url 'https://jitpack.io' }
 }
 
@@ -58,7 +59,7 @@ ext {
 
 //    println 'Configuring for ' + project.name + " " + tagVersion + " by " + vendor
 }
-group = "net.rptools.noise-lib"
+group = "net.rptools.noiselib"
 
 spotless {
     java {
@@ -85,10 +86,14 @@ spotless {
     }
 }
 
+configurations {
+    deployerJars
+}
+
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'NoiseLib',
+        attributes 'Implementation-Title': 'Noise Lib',
                 'Implementation-Version': project.version
     }
 }
