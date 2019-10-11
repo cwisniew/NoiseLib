@@ -10,7 +10,7 @@ class Utils {
     Random random = new Random(seed); // Use seed as we want repeatability
 
     for (int i = 0; i < newArray.length; i++) {
-      int randPos = random.nextInt();
+      int randPos = random.nextInt() % newArray.length;
       int temp = newArray[i];
       newArray[i] = newArray[randPos];
       newArray[randPos] = temp;
